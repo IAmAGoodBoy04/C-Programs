@@ -77,6 +77,7 @@ int main()
     for(int x=0;x<v-1;x++){
         array_of_tables[x]=(int *)malloc(sizeof(int));
     }
+
     
     free(dec_inputs);
     free(array_of_tables);
