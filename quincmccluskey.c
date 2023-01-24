@@ -72,9 +72,14 @@ int main()
         }
         k++;
     }
+    int **array_of_tables;
+    array_of_tables=(int **)malloc((v-1)*sizeof(int *));
+    for(int x=0;x<v-1;x++){
+        array_of_tables[x]=(int *)malloc(sizeof(int));
+    }
     
-
     free(dec_inputs);
+    free(array_of_tables);
     free(initial_binary_numbers);
     return 0;
 }
