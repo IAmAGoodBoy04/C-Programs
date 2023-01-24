@@ -72,10 +72,7 @@ int main()
         }
         k++;
     }
-    for (int j = 0; j < v * (i + 1); j++)
-    {
-        printf("%d ", initial_binary_numbers[j]);
-    }
+    
 
     free(dec_inputs);
     free(initial_binary_numbers);
