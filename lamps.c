@@ -25,6 +25,5 @@ int main(){
         x=lamps(n,s);
         printf("%d\n",x);
     }
-
     return 0;
 }
