@@ -5,7 +5,7 @@ int main()
 {
     int vowels = 0, words = 1, consonants = 0, characters = 0;
     char str[9999];
-    printf("Enter the characters\n");
+    printf("Enter the sentence:\n");
     gets(str);
     for (int i = 0; str[i] != 0; i++)
     {
@@ -16,9 +16,9 @@ int main()
             else
             {consonants++;}
         }
-        if (str[i] > 32 && str[i] <= 47 || str[i] >= 58 && str[i] <= 64 || str[i] >= 91 || str[i] <= 96 || str[i] >= 123 || str[i] <= 126)
+        if (str[i] > 32 && str[i] <= 47 || str[i] >= 58 && str[i] <= 64 || str[i] >= 91 && str[i] <= 96 || str[i] >= 123 && str[i] <= 126)
         {characters++;}
     }
-    printf("Number of vowels : %d\nNumber of words : %d\nNumber of consonants : %d\nNumber of characters : %d\n", vowels, words, consonants, characters);
+    printf("Number of vowels : %d\nNumber of words : %d\nNumber of consonants : %d\nNumber of special characters : %d\n", vowels, words, consonants, characters);
     return 0;
 }
