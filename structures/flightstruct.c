@@ -36,12 +36,14 @@ void admin_portal(flights *arr,int *n){
     printf("Admin portal closed\n\n");
 }
 void booking_portal(flights *arr,int n){
-    if(n<1){printf("No flights available");}
-    else{
-        char source[4];
-        char dest[4];
+    char *source;
+        char *dest;
+        source=malloc(10*sizeof(char));
+        dest=malloc(10*sizeof(char));
         char c;
         int dep;
+    if(n<1){printf("No flights available");}
+    else{
         printf("\nSource City | Destination | Time of Departure | Time of arrival | No of available seats\n\n");
         for(int j=0;j<n;j++){
             printf("%-11s | %-11s | %-17d | %-15d | %d\n",arr[j].source_city_code,arr[j].destination_code,arr[j].departure_time,arr[j].arrival_time,arr[j].no_of_seats);
@@ -50,12 +52,13 @@ void booking_portal(flights *arr,int n){
         printf("Enter source city: ");
         scanf("%s%*c",source);
         printf("Enter destination city: ");
-        scanf("%s%*c",dest);
+        scanf("%s",dest);
         printf("Enter time of departure(in 24 hour format): ");
-        scanf("%d%*c",&dep);
+        scanf("%d",&dep);
+        while((getchar())!='\n');
         for(int i=0;i<=n;i++){
-            if(i==n){printf("No such flight was found,or no seats are left.\n");break;}
-            if(strcmp(source,arr[i].source_city_code)==0 && strcmp(dest,arr[i].destination_code)==0 && dep==arr[i].departure_time && arr[i].no_of_seats>0){
+            if(i>n-1){printf("No such flight was found,or no seats are left.\n");break;}
+            else if(strcmp(source,arr[i].source_city_code)==0 && strcmp(dest,arr[i].destination_code)==0 && dep==arr[i].departure_time && arr[i].no_of_seats>0){
                 printf("Flight booked! Thanks for choosing us.\n");
                 arr[i].no_of_seats--;
                 break;
@@ -70,7 +73,8 @@ void booking_portal(flights *arr,int n){
             printf("Booking portal closed");
         }
     }
-
+    free(source);
+    free(dest);
 }
 int main(){
     flights flight_data[30];
