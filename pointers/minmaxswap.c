@@ -32,23 +32,20 @@ void minmax(int *arr, int n)
 int main()
 {
     int n = 0;
-    printf("Enter the number\n");
+    printf("Enter number of elements in array\n");
     scanf("%d", &n);
     int arr[n];
-    printf("Enter the number in array\n");
+    printf("Enter the array elements\n");
     for (int i = 0; i < n; i++)
     {
         scanf("%d", &arr[i]);
     }
-    for (int i = 0; i < n; i++)
-    {
-        printf("%d ", arr[i]);
-    }
-    printf("\n");
+    
     minmax(arr, n);
     for (int i = 0; i < n; i++)
     {
         printf("%d ", arr[i]);
     }
+    printf("\n");
     return 0;
 }
