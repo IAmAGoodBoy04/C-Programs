@@ -9,10 +9,10 @@ void swap(int *a, int *b){
     *b=temp;
 }
 void printarr(int y,int x, int arr[y][x]){
-    int digitsmax=0,max=arr[0][0];
+    int digitsmax=0,max=*(*(arr+0)+0);
     for(int i=0;i<y;i++){
         for(int j=0;j<x;j++){
-            if(arr[i][j]>max){max=arr[i][j];}
+            if(*(*(arr+i)+j)>max){*(*(arr+i)+j);}
         }
     }
     if(max<0){
@@ -25,14 +25,14 @@ void printarr(int y,int x, int arr[y][x]){
     }
     for(int i=0;i<y;i++){
         for(int j=0;j<x;j++){
-            printf("%*d  ",digitsmax,arr[i][j]);
+            printf("%*d  ",digitsmax,*(*(arr+i)+j));
         }
         printf("\n");
     }
 }
 void reversearr(int y,int x,int arr[y][x]){
-    int *start=&arr[0][0];
-    int *end=&arr[y-1][x-1];
+    int *start=(*(arr+0)+0);
+    int *end=(*(arr+y-1)+x-1);
     for(int c=0;c<y*x/2;c++){
         swap(start,end);
         start++;
@@ -47,7 +47,7 @@ int main(){
     printf("Enter the elements of the array:\n");
     for(int i=0;i<y;i++){
         for(int j=0;j<x;j++){
-            scanf("%d",&arr[i][j]);
+            scanf("%d",(*(arr+i)+j));
         }
     }
     reversearr(y,x,arr);
