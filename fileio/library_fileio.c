@@ -13,14 +13,14 @@ int main(){
     char isbn[14],title[50],author[50];
     FILE* library,* hardback,* paperback;
     library=fopen("all_books.txt","a");
-    hardback=fopen("hardbacks,txt","a");
+    hardback=fopen("hardbacks.txt","a");
     paperback=fopen("paperbacks.txt","a");
     printf("Enter number of records you want to add: ");
     scanf("%d",&n);
     if(n>0){printf("Enter all records in the format Type(p,h or b),ISBN,Title,author, each in a new line\n");}
-    fprintf(library,"TYPE AVAILABLE | ISBN          | TITLE                        | AUTHOR\n");
-    fprintf(hardback,"ISBN          | TITLE                        | AUTHOR\n");
-    fprintf(paperback,"ISBN          | TITLE                         | AUTHOR\n");
+    fprintf(library,"TYPE AVAILABLE | ISBN          | TITLE                          | AUTHOR\n");
+    fprintf(hardback,"ISBN          | TITLE                          | AUTHOR\n");
+    fprintf(paperback,"ISBN          | TITLE                          | AUTHOR\n");
     for(int i=0;i<n;i++){
         while((getchar())!='\n');
         scanf("%c",&type);
