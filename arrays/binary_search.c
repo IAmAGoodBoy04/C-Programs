@@ -14,15 +14,15 @@ Binary Search will search a sorted array by repeatedly dividing the search inter
 */
 #include<stdio.h>
 void sort (int arr[], int n){
-    int temp;
-    for(int i=0;i<n-1;i++){
-        for(int j=i+1;j<n;j++){
-            if(arr[i]>arr[j]){
-                temp=arr[i];
-                arr[i]=arr[j];
-                arr[j]=temp;
-            }
+    int temp,i,j;
+    for(i=1;i<n;i++){
+        temp=arr[i];
+        j=i-1;
+        while(arr[j]>temp && j>=0){
+            arr[j+1]=arr[j];
+            j--;
         }
+        arr[j+1]=temp;
     }
 }
 int binarysearch(int arr[], int n, int x){
