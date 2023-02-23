@@ -57,13 +57,17 @@ int main(){
                 break;
             }
         }
+
         if(flag==0){
             printf("Record not found!\n");
         }
         flag=0;
+        free(tempstr);
+        free(tempstr2);
+        free(tempstr3);
     }
     }
-
+    
     fclose(records);
 return 0;
 }
