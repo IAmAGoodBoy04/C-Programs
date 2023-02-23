@@ -13,12 +13,13 @@ int main(){
     int x,n;
     vrec temprecord;
     FILE *records;
-    records=fopen("Vehicle_records.txt","a+");
+    
     while(1){
     printf("Enter 1 to append vehicle records, 0 to access them or -1 to exit: ");
     scanf("%d",&x);
     if(x==-1){break;}
     if(x==1){
+        records=fopen("Vehicle_records.txt","a+");
         printf("Enter number of records to add: ");
         scanf("%d",&n);
         for(int i=0;i<n;i++){
@@ -34,8 +35,10 @@ int main(){
             fprintf(records,"\n");
             }
         }
+        fclose(records);
     }
     if(x==0){
+        records=fopen("Vehicle_records.txt","a+");
         char *tempstr,*tempstr2,*tempstr3;
         char reg[15];
         tempstr=(char*)calloc(51,sizeof(char));
@@ -65,9 +68,8 @@ int main(){
         free(tempstr);
         free(tempstr2);
         free(tempstr3);
+        fclose(records);
     }
     }
-    
-    fclose(records);
 return 0;
 }
