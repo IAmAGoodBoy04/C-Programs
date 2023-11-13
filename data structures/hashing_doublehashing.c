@@ -36,11 +36,14 @@ typedef struct {
 
 
 KeyValue *createKeyValue(char *key, char *value) {
-    KeyValue* newKeyValue = (KeyValue*)malloc(sizeof(KeyValue));
+    KeyValue* newKeyValue = malloc(sizeof(KeyValue));
     if (newKeyValue != NULL) {
-        newKeyValue->key = key;
-        newKeyValue->value = value;
+        newKeyValue->key=malloc((strlen(key)+1)*sizeof(char));
+        newKeyValue->value=malloc((strlen(value)+1)*sizeof(char));
+        strcpy(newKeyValue->key,key);
+        strcpy(newKeyValue->value,value);
     }
+    newKeyValue->isDeleted=false;
     return newKeyValue;
 }
 
@@ -63,7 +66,8 @@ HashTable* createHashTable() {
 int key_to_int(char* key){
     int hash=0,ind=0;
     while(key[ind]!='\0'){
-        hash+=(key[ind]+128);
+        hash+=((int)key[ind]+128);
+        ind++;
     }
     hash%=TABLE_SIZE;
     return hash;
@@ -84,24 +88,45 @@ int insert_key_value(HashTable *ht, char* key, char* value){
     KeyValue* to_insert=createKeyValue(key,value);
     if(ht->array[h1]==NULL){
         ht->array[h1]=to_insert;
-        ht->num_keys++;
+        ht->num_ops++;
+        retval=h1;
+    }
+    else if(ht->array[h1]->isDeleted==true){
+        ht->array[h1]->isDeleted=false;
+        strcpy(ht->array[h1]->key,key);
+        strcpy(ht->array[h1]->value,value);
+        free(to_insert);
+        ht->num_ops++;
         retval=h1;
     }
     else{
         int h2=secondhash(h1);
-        int index=(h1+h2)%TABLE_SIZE;
+        int index=h1;
         while(ht->array[index]!=NULL){
+            if(ht->array[index]->isDeleted==true){
+                ht->array[index]->isDeleted=false;
+                strcpy(ht->array[index]->key,key);
+                strcpy(ht->array[index]->value,value);
+                free(to_insert);
+                retval=index;
+                ht->num_ops++;
+                goto wasdeleted;
+            }
             index+=h2;
             index%=TABLE_SIZE;
+            ht->num_ops++;
             if(index==h1){//if index becomes equal to initial value again, it means it has gone into a loop
                 return 1;
             }
         }
         ht->array[index]=to_insert;
+        retval=index;
+        ht->num_ops++;
     }
-
+    wasdeleted:
+    ht->num_keys++;
     ht->num_occupied_indices++;
-    ht->num_ops++;
+
     return retval;
 }
 
@@ -110,17 +135,23 @@ int insert_key_value(HashTable *ht, char* key, char* value){
 char *search_key(HashTable *ht, char* key){
     int h1=key_to_int(key);
     int index=h1;
-    if(ht->array[index]!=NULL){
+    if(ht->array[index]==NULL){
+        return NULL;
+    }
+    else if(strcmp(ht->array[index]->key,key)==0 && ht->array[index]->isDeleted==false){
+        ht->num_ops++;
         return ht->array[index]->value;
     }
     else{
         int h2=secondhash(index);
         for(int i=0;i<TABLE_SIZE;i++){//if the item is not found after table_size number of iterations, it means it doesn't exist as the function may have gotten stuck in a loop
             index+=h2;
+            index%=TABLE_SIZE;
+            ht->num_ops++;
             if(ht->array[index]==NULL){
                 return NULL;
             }
-            else if(strcmp(ht->array[index]->key,key)==0){
+            else if(strcmp(ht->array[index]->key,key)==0 && ht->array[index]->isDeleted==false){
                 return ht->array[index]->value;
             }
             else if(index==h1){
@@ -134,33 +165,55 @@ char *search_key(HashTable *ht, char* key){
 // return the index position in the table where the deletion happens
 // return -1 if deletion fails
 int delete_key(HashTable *ht, char* key){
+    int n=ht->num_ops;
     char *temp=search_key(ht,key);
+    ht->num_ops=n;
     if(temp==NULL){
         return -1;
     }
-    KeyValue* marker=createKeyValue(NULL,NULL);//marker to be put in place of deleted entry
     int index=key_to_int(key);
     int h2=secondhash(index);
     while(strcmp(ht->array[index]->key,key)!=0){
+        ht->num_ops++;
         index+=h2;
+        index%=TABLE_SIZE;
     }
-    KeyValue* temp=ht->array[index];
-    ht->array[index]=marker;
-    free(temp);
+    ht->num_ops++;
+    ht->array[index]->isDeleted=true;
+    ht->num_keys--;
+    ht->num_occupied_indices--;
     return index;
 }
 
 // this equals the number of keys in table/size of table
-int get_load_factor(HashTable *ht){
-    
+float get_load_factor(HashTable *ht){
+    float lf=(float)ht->num_keys/TABLE_SIZE;
+    ht->load_factor=lf;
+    return lf;
 }
 
 // this equals the number of operations done so far/num of elems in table
-int get_avg_probes(HashTable *ht);
+float get_avg_probes(HashTable *ht){
+    return ht->num_ops/ht->num_occupied_indices;
+}
 
 // display hash table visually
-void display(HashTable *ht);
-
+void display(HashTable *ht){
+    printf("displaying hash table:\n");
+    printf("\nINDEX\t%-35s\t%-35s\n\n","KEY","VALUE");
+    for(int i=0;i<TABLE_SIZE;i++){
+        if(ht->array[i]==NULL){
+            printf("%-5d\t%-35s\t%-35s\n",i,"NULL","NULL");
+        }
+        else if(ht->array[i]->isDeleted==true){
+            printf("%-5d\t%-35s\t%-35s\n",i,"deleted","deleted");
+        }
+        else{
+            printf("%-5d\t%-35s\t%-35s\n",i,ht->array[i]->key,ht->array[i]->value);
+        }
+    }
+    printf("\n");
+}
 
 // -> Insert the following key, values in the table:
 // 1. 'first name' -> <your first name>
@@ -177,3 +230,50 @@ void display(HashTable *ht);
 // 12. 'book' -> <your favorite book>
 
 // -> Test the table with search and delete operations
+
+int main(){
+    HashTable *ht= createHashTable();
+	char key[12][40]= {"first name", "last name", "uid", "sport", "food", "holiday", "role_model", "subject", "song", "movie", "colour", "book"};
+	char value[12][40]= {"Shubhan", "Singh", "20223001118", "Cricket", "Paneer", "Himalayas", "Nobody specific", "Maths", "Birthquake", "The good, the bad and the ugly", "Light blue", "Nineteen eighty four"};
+	// Insertion of all the values:
+    int insert;
+	for(int i=0; i<12; i++)
+	{
+		insert= insert_key_value(ht, key[i], value[i]);
+        if(insert==-1){
+            printf("Insertion failed for key \"%s\"\n",key[i]);
+        }
+	}
+    printf("After inserting all vlaues:\n\n");
+	display(ht);
+	printf("\nTotal number of Operations: %d\n", ht->num_ops);
+	printf("\nThe load factor for the hash table is: %.2f\n",get_load_factor(ht));
+
+	// Displaying a value whose key is present.
+	printf("\nValue of the Key \"song\": %s\n", search_key(ht, "song"));
+	
+	// Displaying a value whose key is NOT present.
+	char* st=search_key(ht,"album");
+    if(st==NULL){
+        printf("\nKey %s not present\n","album");
+    }
+
+    delete_key(ht,key[5]);
+    printf("\nAfter deleting key \"holiday\":\n");
+    display(ht);
+    delete_key(ht,key[8]);
+    printf("\nAfter deleting key \"song\":\n");
+    display(ht);
+    insert=insert_key_value(ht,key[8],value[8]);
+    if(insert==-1){
+        printf("Insertion failed for key \"%s\"\n",key[8]);
+    }
+    insert=insert_key_value(ht,key[5],value[5]);
+    if(insert==-1){
+        printf("Insertion failed for key \"%s\"\n",key[5]);
+    }
+    printf("After inserting deleted keys back:\n");
+    display(ht);
+
+return 0;
+}
