@@ -42,8 +42,8 @@ KeyValue *createKeyValue(char *key, char *value) {
         newKeyValue->value=malloc((strlen(value)+1)*sizeof(char));
         strcpy(newKeyValue->key,key);
         strcpy(newKeyValue->value,value);
+        newKeyValue->isDeleted=false;
     }
-    newKeyValue->isDeleted=false;
     return newKeyValue;
 }
 
@@ -116,7 +116,7 @@ int insert_key_value(HashTable *ht, char* key, char* value){
             index%=TABLE_SIZE;
             ht->num_ops++;
             if(index==h1){//if index becomes equal to initial value again, it means it has gone into a loop
-                return 1;
+                return -1;
             }
         }
         ht->array[index]=to_insert;
@@ -194,7 +194,7 @@ float get_load_factor(HashTable *ht){
 
 // this equals the number of operations done so far/num of elems in table
 float get_avg_probes(HashTable *ht){
-    return ht->num_ops/ht->num_occupied_indices;
+    return (float)ht->num_ops/ht->num_occupied_indices;
 }
 
 // display hash table visually
